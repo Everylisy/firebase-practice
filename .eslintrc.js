@@ -7,8 +7,10 @@ module.exports = {
 	extends: [
 		'eslint:recommended',
 		'plugin:react/recommended',
+		'plugin:import/recommended',
 		'plugin:@typescript-eslint/recommended',
 		'airbnb',
+		'airbnb-typescript',
 		'plugin:prettier/recommended',
 	],
 	parser: '@typescript-eslint/parser',
@@ -19,7 +21,7 @@ module.exports = {
 		ecmaVersion: 'latest',
 		sourceType: 'module',
 	},
-	plugins: ['react', 'react-hooks', '@typescript-eslint', 'prettier'],
+	plugins: ['import', 'react', 'react-hooks', '@typescript-eslint', 'prettier'],
 	rules: {
 		'react/react-in-jsx-scope': 0,
 		'react/prefer-stateless-function': 0,

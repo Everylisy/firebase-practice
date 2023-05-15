@@ -1,9 +1,10 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
 } from "firebase/auth";
 import React, { useState } from "react";
-import { authService } from "fbInstance";
+import { authService, provider } from "fbInstance";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -37,6 +38,23 @@ const Auth = () => {
 
   const toggleAccount = () => setNewAccount((prev) => !prev);
 
+  const socialLoginClickHanlder = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    try {
+      const { name } = e.currentTarget;
+      if (name === "google") {
+        await signInWithPopup(authService, provider);
+      }
+    } catch (error: any) {
+      setErrorMsg(error.message);
+      console.error(
+        "Fetch Error:",
+        error instanceof Error ? error.message : error,
+      );
+    }
+  };
+
   return (
     <div>
       <form onSubmit={submitHandler}>
@@ -59,10 +77,14 @@ const Auth = () => {
         />
         <button type="submit">{newAccount ? "회원가입" : "로그인"}</button>
       </form>
+
       <span>{errorMsg}</span>
       <span onClick={toggleAccount}>{newAccount ? "로그인" : "회원가입"}</span>
+
       <div>
-        <button>구글 계정으로 로그인</button>
+        <button name="google" onClick={socialLoginClickHanlder}>
+          구글 계정으로 로그인
+        </button>
       </div>
     </div>
   );

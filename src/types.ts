@@ -1,3 +1,5 @@
+import type { User } from "firebase/auth";
+
 export interface routerProps {
-  isLoggedIn: boolean;
+  isLoggedIn: User | null;
 }

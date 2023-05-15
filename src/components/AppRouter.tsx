@@ -1,7 +1,7 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import Auth from "../pages/Auth";
-import Home from "../pages/Home";
-import type { routerProps } from "../types";
+import Auth from "pages/Auth";
+import Home from "pages/Home";
+import type { routerProps } from "types";
 
 const AppRouter = ({ isLoggedIn }: routerProps) => {
   return (

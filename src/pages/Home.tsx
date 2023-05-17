@@ -6,6 +6,7 @@ import {
   query,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import NoteItem from "components/NoteItem";
 import { dbService } from "fbInstance";
 import type { INoteData, IUserObj } from "types";
 
@@ -59,10 +60,12 @@ const Home = ({ userObj }: IUserObj) => {
       </form>
 
       <div>
-        {noteData.map((text) => (
-          <div key={text.id}>
-            <h4>{text.text}</h4>
-          </div>
+        {noteData.map((data) => (
+          <NoteItem
+            key={data.id}
+            data={data}
+            isOwner={data.creatorId === userObj?.uid}
+          />
         ))}
       </div>
     </div>

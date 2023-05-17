@@ -1,53 +1,41 @@
 import {
   addDoc,
   collection,
-  getDocs,
+  onSnapshot,
   orderBy,
   query,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { dbService } from "fbInstance";
-import type { INoteData } from "types";
+import type { INoteData, IUserObj } from "types";
 
-const Home = () => {
+const Home = ({ userObj }: IUserObj) => {
   const [note, setNote] = useState("");
   const [noteData, setNoteData] = useState<INoteData[]>([]);
 
-  const getNoteData = async () => {
-    try {
-      const getNotesQuery = query(
-        collection(dbService, "notes"),
-        orderBy("createdAt", "desc"),
-      );
-      const querySnapshot = await getDocs(getNotesQuery);
-      querySnapshot.forEach((doc) => {
-        const newNoteData = {
-          ...doc.data(),
-          id: doc.id,
-        } as INoteData;
-        setNoteData((prev) => [newNoteData, ...prev]);
-      });
-    } catch (error: any) {
-      console.error(
-        "Error getting document:",
-        error instanceof Error ? error.message : error,
-      );
-    }
-  };
-
   useEffect(() => {
-    getNoteData();
+    const getNotesQuery = query(
+      collection(dbService, "notes"),
+      orderBy("createdAt", "desc"),
+    );
+    onSnapshot(getNotesQuery, (snapshot) => {
+      const newNoteData = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })) as INoteData[];
+      setNoteData(newNoteData);
+    });
   }, []);
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      const docRef = await addDoc(collection(dbService, "notes"), {
+      await addDoc(collection(dbService, "notes"), {
         text: note,
         createdAt: Date.now(),
+        creatorId: userObj?.uid,
       });
-      console.log("Document written with ID: ", docRef.id);
       setNote("");
     } catch (error: any) {
       console.error(

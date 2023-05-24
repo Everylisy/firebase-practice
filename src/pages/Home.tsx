@@ -13,8 +13,8 @@ import type { INoteData, IUserObj } from "types";
 const Home = ({ userObj }: IUserObj) => {
   const [note, setNote] = useState("");
   const [noteData, setNoteData] = useState<INoteData[]>([]);
-  const [attatchment, setAttatchment] = useState();
-  const fileInput = useRef();
+  const [imgString, setImgString] = useState(null);
+  const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const getNotesQuery = query(
@@ -50,20 +50,19 @@ const Home = ({ userObj }: IUserObj) => {
 
   const fileChangeHandler = (e: React.FormEvent<HTMLInputElement>) => {
     const { files } = e.currentTarget;
-    if (!files) return;
-
     const imgFile = files[0];
+
     const reader = new FileReader();
-    reader.onloadend = (e) => {
-      const { result } = e.currentTarget;
-      setAttatchment(result);
+    if (imgFile) reader.readAsDataURL(imgFile);
+    reader.onloadend = (finishedEvent: ProgressEvent<FileReader>) => {
+      const { result } = finishedEvent.target;
+      setImgString(result);
     };
-    reader.readAsDataURL(imgFile);
   };
 
-  const onClearAttachment = () => {
-    setAttatchment(null);
-    fileInput.current.value = null;
+  const clearPreviewHandler = () => {
+    setImgString(null);
+    if (fileInput) fileInput.current.value = null;
   };
 
   return (
@@ -82,10 +81,14 @@ const Home = ({ userObj }: IUserObj) => {
           onChange={fileChangeHandler}
           ref={fileInput}
         />
-        <img src={attatchment} alt="preview" width="50px" height="50px" />
         <button type="submit">작성</button>
+        {imgString && (
+          <div>
+            <img src={imgString} alt="preview" width="50px" height="50px" />
+            <button onClick={clearPreviewHandler}>Clear</button>
+          </div>
+        )}
       </form>
-      <button onClick={onClearAttachment}>Clear</button>
 
       <div>
         {noteData.map((data) => (

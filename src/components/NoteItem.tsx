@@ -1,17 +1,22 @@
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { deleteObject, ref } from "firebase/storage";
 import { useState } from "react";
-import { dbService } from "fbInstance";
+import { dbService, storageService } from "fbInstance";
 import type { noteItemProps } from "types";
 
 const NoteItem = ({ data, isOwner }: noteItemProps) => {
   const [editMode, setEditMode] = useState(false);
   const [newNote, setNewNote] = useState(data.text);
   const noteTextRef = doc(dbService, "notes", `${data.id}`);
+  const noteImgRef = ref(storageService, data.imgFileURL);
 
   const deleteClickHandler = async () => {
     const ok = window.confirm("정말 글을 삭제하시겠습니까?");
     try {
-      if (ok) await deleteDoc(noteTextRef);
+      if (ok) {
+        await deleteDoc(noteTextRef);
+        if (data.imgFileURL !== "") await deleteObject(noteImgRef);
+      }
     } catch (error) {
       console.error(
         "Note delete Error:",
@@ -56,6 +61,14 @@ const NoteItem = ({ data, isOwner }: noteItemProps) => {
       ) : (
         <>
           <h4>{data.text}</h4>
+          {data.imgFileURL && (
+            <img
+              src={data.imgFileURL}
+              alt="Note Image"
+              width="50px"
+              height="50px"
+            />
+          )}
           {isOwner && (
             <>
               <button onClick={deleteClickHandler}>삭제</button>

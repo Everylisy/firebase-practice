@@ -5,15 +5,17 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import React, { useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import NoteItem from "components/NoteItem";
-import { dbService } from "fbInstance";
+import { dbService, storageService } from "fbInstance";
 import type { INoteData, IUserObj } from "types";
 
 const Home = ({ userObj }: IUserObj) => {
   const [note, setNote] = useState("");
   const [noteData, setNoteData] = useState<INoteData[]>([]);
-  const [imgString, setImgString] = useState(null);
+  const [imgString, setImgString] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -33,13 +35,22 @@ const Home = ({ userObj }: IUserObj) => {
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    let imgFileURL = "";
+    if (imgString !== "") {
+      const imgFileRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
+      const response = await uploadString(imgFileRef, imgString, "data_url");
+      imgFileURL = await getDownloadURL(response.ref);
+    }
+
     try {
       await addDoc(collection(dbService, "notes"), {
         text: note,
         createdAt: Date.now(),
         creatorId: userObj?.uid,
+        imgFileURL,
       });
       setNote("");
+      setImgString("");
     } catch (error: any) {
       console.error(
         "Error adding document:",
@@ -56,12 +67,12 @@ const Home = ({ userObj }: IUserObj) => {
     if (imgFile) reader.readAsDataURL(imgFile);
     reader.onloadend = (finishedEvent: ProgressEvent<FileReader>) => {
       const { result } = finishedEvent.target;
-      setImgString(result);
+      setImgString(result as string);
     };
   };
 
   const clearPreviewHandler = () => {
-    setImgString(null);
+    setImgString("");
     if (fileInput) fileInput.current.value = null;
   };
 

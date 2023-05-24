@@ -14,6 +14,7 @@ export interface INoteData {
   createdAt: number;
   id: string;
   creatorId: string;
+  imgFileURL: string;
 }
 
 export interface IUserObj {

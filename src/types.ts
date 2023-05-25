@@ -1,7 +1,8 @@
 import type { User } from "firebase/auth";
 
 export interface routerProps extends IUserObj {
-  isLoggedIn: boolean;
+  isLoggedIn?: boolean;
+  refreshUser: () => void;
 }
 
 export interface noteItemProps {

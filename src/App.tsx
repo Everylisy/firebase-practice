@@ -1,5 +1,4 @@
-import type { User } from "firebase/auth";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, updateProfile } from "firebase/auth";
 import { useEffect, useState } from "react";
 import AppRouter from "components/AppRouter";
 import { authService } from "fbInstance";
@@ -7,13 +6,16 @@ import { authService } from "fbInstance";
 const App = () => {
   const [fbInit, setFbInit] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userObj, setUserObj] = useState<User | null>(null);
+  const [userObj, setUserObj] = useState(null);
 
   useEffect(() => {
     onAuthStateChanged(authService, (user) => {
       if (user) {
         setIsLoggedIn(true);
-        setUserObj(user);
+        setUserObj({
+          displayName: user.displayName,
+          uid: user.uid,
+        });
       } else {
         setIsLoggedIn(false);
       }
@@ -21,10 +23,23 @@ const App = () => {
     });
   }, []);
 
+  const refreshUser = () => {
+    const user = authService.currentUser;
+    setUserObj({
+      displayName: user.displayName,
+      uid: user.uid,
+      updateProfile: updateProfile(user, { displayName: user.displayName }),
+    });
+  };
+
   return (
     <>
       {fbInit ? (
-        <AppRouter isLoggedIn={isLoggedIn} userObj={userObj} />
+        <AppRouter
+          isLoggedIn={isLoggedIn}
+          userObj={userObj}
+          refreshUser={refreshUser}
+        />
       ) : (
         "초기화 중..."
       )}

@@ -10,10 +10,10 @@ import Home from "pages/Home";
 import Profile from "pages/Profile";
 import type { routerProps } from "types";
 
-const AppRouter = ({ isLoggedIn, userObj }: routerProps) => {
+const AppRouter = ({ isLoggedIn, userObj, refreshUser }: routerProps) => {
   return (
     <Router>
-      {isLoggedIn && <Navigation />}
+      {isLoggedIn && <Navigation userObj={userObj} />}
       <Routes>
         <Route
           path="/"
@@ -21,7 +21,13 @@ const AppRouter = ({ isLoggedIn, userObj }: routerProps) => {
         />
         <Route
           path="/profile"
-          element={isLoggedIn ? <Profile /> : <Navigate to="/" replace />}
+          element={
+            isLoggedIn ? (
+              <Profile userObj={userObj} refreshUser={refreshUser} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

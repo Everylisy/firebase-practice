@@ -23,21 +23,18 @@ const Profile = ({ userObj, refreshUser }: routerProps) => {
     }
   };
 
-  const getMyNotes = async () => {
-    const getNotesQuery = query(
-      notesRef,
-      where("creatorId", "==", userObj.uid),
-      orderBy("createdAt", "desc"),
-    );
-    const querySnapshot = await getDocs(getNotesQuery);
-    // querySnapshot.forEach((doc) => {
-    //   console.log(doc.id, " => ", doc.data());
-    // });
-  };
+  // const getMyNotes = async () => {
+  //   const getNotesQuery = query(
+  //     notesRef,
+  //     where("creatorId", "==", userObj.uid),
+  //     orderBy("createdAt", "desc"),
+  //   );
+  //   const querySnapshot = await getDocs(getNotesQuery);
+  // };
 
-  useEffect(() => {
-    getMyNotes();
-  }, []);
+  // useEffect(() => {
+  //   getMyNotes();
+  // }, []);
 
   return (
     <>
